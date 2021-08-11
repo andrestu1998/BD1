@@ -91,3 +91,79 @@ USE YLP_TLC
 	FROM [YLP_TLC].[dbo].[Inventario] 
 	INNER JOIN Automovil ON Inventario.automovil = Automovil.idAutomovil
 	Where idAutomovil = 'CAM-000001'
+
+--Contando los registros de cada tabla
+SELECT COUNT(*) CantidadSucursales FROM Sucursal
+
+SELECT COUNT(*) CantidadEmpleadosPorSucursal, S.ciudad FROM Usuario U
+	INNER JOIN Sucursal S ON U.sucursal = S.idSucursal
+	GROUP BY S.ciudad
+
+SELECT COUNT(*) CantidadEmpleadosPorRol, R.rol FROM Usuario U
+	INNER JOIN UsuarioRol UR ON U.idUsuario = UR.usuario
+	INNER JOIN Rol R ON UR.rol = R.idRol
+	GROUP BY R.rol
+
+SELECT COUNT(*) CLIENTESPORSUCURSAL, S.ciudad FROM Factura F
+	INNER JOIN Cliente C ON F.cliente = C.idCliente
+	INNER JOIN Sucursal S ON F.sucursal = S.idSucursal
+	GROUP BY S.ciudad
+SELECT * FROM Factura
+SELECT * FROM DetallePago
+
+--FORMATO DE UNA FACTURA
+SELECT	F.sucursal,
+		U.idUsuario,
+		U.nombre,
+		U.apellido,
+		--R.rol,
+		C.id,
+		C.nombre,
+		C.apellido,
+		F.tipoPago,
+		F.fecha,
+		SER.tipoServicio,
+		A.marca,
+		A.modelo,
+		A.anio,
+		I.kilometraje,
+		I.combustible,
+		SE.nombre,
+		DP.subtotal,
+		DP.isv,
+		DP.total,
+		S.ciudad 
+		FROM Factura F
+	INNER JOIN Usuario U ON F.usuario = U.idUsuario
+	INNER JOIN UsuarioRol UR ON U.idUsuario = UR.usuario
+	INNER JOIN Rol R ON UR.rol = R.idRol
+	INNER JOIN Cliente C ON F.cliente = C.idCliente
+	INNER JOIN DetallePago DP ON F.detallePago = DP.idDetalle
+	INNER JOIN Servicio SER ON DP.servicio = SER.idServicio
+	INNER JOIN Sucursal S ON F.sucursal = S.idSucursal			
+	INNER JOIN Inventario I ON F.sucursal = I.sucursal			
+	INNER JOIN Automovil A ON I.automovil = A.idAutomovil
+	INNER JOIN Seguro SE ON DP.seguro = SE.idSeguro
+	GROUP BY F.sucursal,
+		U.idUsuario,
+		U.nombre,
+		U.apellido,
+		--R.rol,
+		C.id,
+		C.nombre,
+		C.apellido,
+		F.tipoPago,
+		F.fecha,
+		SER.tipoServicio,
+		A.marca,
+		A.modelo,
+		A.anio,
+		I.kilometraje,
+		I.combustible,
+		SE.nombre,
+		DP.subtotal,
+		DP.isv,
+		DP.total,
+		S.ciudad 
+	HAVING DP.total < 20000
+	ORDER BY DP.total DESC
